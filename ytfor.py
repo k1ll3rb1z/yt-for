@@ -1,17 +1,22 @@
 import tkinter as tk
-import os
+import subprocess
 
 root = tk.Tk()
 root.title('video downloader for Finette')
 root.geometry('1280x150+20+20')
 options = {'padx': 5, 'pady': 5}
-outpath='/tmp'
+outpath='/tmp/'
 ffmpeg_path='/sbin/ffmpeg'
 
-def download_url(url) -> str:
+def download_url(url, status_label) -> None:
     """ Download the video given as arg with yt-dlp
     """
-    return os.popen(f'yt-dlp --ffmpeg-location {ffmpeg_path} -P {outpath} -o "%(title)s.%(ext)s" {url}').read()
+    cmd=['yt-dlp', '--ffmpeg-location', f'{ffmpeg_path}', '--force-overwrites', '-P', f'{outpath}',  '-o', '%(title)s.%(ext)s', f'{url}']
+    print(' '.join(cmd))
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    output=process.stdout.readline()
+    status_label.config(text=output)
+    process.wait()
 
 frame = tk.Frame(root)
 
@@ -32,8 +37,7 @@ url_entry.focus()
 def download_button_clicked():
     try:
         u = url.get()
-        r = download_url(u)
-        status_label.config(text=r)
+        r = download_url(u, status_label)        
     except ValueError as error:
         showerror(title='Error', message=error)
 
