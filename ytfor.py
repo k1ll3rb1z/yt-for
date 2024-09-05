@@ -9,6 +9,34 @@ options = {'padx': 5, 'pady': 5}
 outpath='/tmp/'
 ffmpeg_path='/sbin/ffmpeg'
 
+
+class TextEx(tk.Text):
+    """
+    Extended entry widget that includes a context menu
+    with Copy, Cut and Paste commands.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.menu = tk.Menu(self, tearoff=False)
+        self.menu.add_command(label="Copy", command=self.popup_copy)
+        self.menu.add_command(label="Cut", command=self.popup_cut)
+        self.menu.add_separator()
+        self.menu.add_command(label="Paste", command=self.popup_paste)
+        self.bind("<Button-3>", self.display_popup)
+
+    def display_popup(self, event):
+        self.menu.post(event.x_root, event.y_root)
+
+    def popup_copy(self):
+        self.event_generate("<<Copy>>")
+
+    def popup_cut(self):
+        self.event_generate("<<Cut>>")
+
+    def popup_paste(self):
+        self.event_generate("<<Paste>>")
+
 frame = tk.Frame(root)
 
 #Boutton to quit the app
@@ -71,7 +99,7 @@ clip_button.configure(command=clip_button_clicked)
 # status label
 #status = tk.StringVar()
 #status_label = tk.Entry(frame, textvariable=status, justify=tk.LEFT, state=tk.DISABLED)
-status_text = tk.Text(frame, heigh=10, width=128, wrap=tk.WORD) #, state=tk.DISABLED)
+status_text = TextEx(frame, heigh=10, width=128, wrap=tk.WORD) #, state=tk.DISABLED)
 status_text.grid(row=2, columnspan=10, **options)
 #status_label.grid(row=2, **options)
 
